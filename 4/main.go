@@ -2,9 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"strconv"
 	"strings"
 )
+
+/*
+ PART ONE
+*/
 
 /*
 However, they do remember a few key facts about the password:
@@ -19,11 +24,11 @@ Other than the range rule, the following are true:
     111111 meets these criteria (double 11, never decreases).
     223450 does not meet these criteria (decreasing pair of digits 50).
     123789 does not meet these criteria (no double).
- */
+*/
 
-func isAscending(str string) bool {
+func partOneHasDoubleDigits(str string) bool {
 	var previous uint8 = 0
-	for i:= 0; i < len(str); i++ {
+	for i := 0; i < len(str); i++ {
 		var char = str[i]
 		if previous == char {
 			return true
@@ -33,9 +38,9 @@ func isAscending(str string) bool {
 	return false
 }
 
-func hasDoubleDigits(str string) bool {
+func isAscending(str string) bool {
 	var previous uint8 = 0
-	for i:= 0; i < len(str); i++ {
+	for i := 0; i < len(str); i++ {
 		var char = str[i]
 		if previous < char {
 			previous = char
@@ -45,8 +50,53 @@ func hasDoubleDigits(str string) bool {
 			return false
 		}
 	}
-
 	return true
+}
+
+/*
+ PART TWO
+*/
+
+/*
+Given this additional criterion, but still ignoring the range rule, the following are now true:
+
+    112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
+    123444 no longer meets the criteria (the repeated 44 is part of a larger group of 444).
+    111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
+*/
+
+func partTwoHasDoubleDigits(str string) bool {
+	var previous uint8 = 0
+	// Store repeated characters
+	var repeated = make(map[uint8]int)
+
+	for i := 0; i < len(str); i++ {
+		var char = str[i]
+		if previous == char {
+			if val, ok := repeated[char]; ok {
+				repeated[char] = val + 1
+			} else {
+				repeated[char] = 1
+			}
+		}
+		previous = char
+	}
+
+	// Extract a list of values
+	v := make([]int, 0, len(repeated))
+
+	for  _, value := range repeated {
+		v = append(v, value)
+	}
+
+	// Find if multiple characters only occur once
+	for _, b := range v {
+		if b == 1 {
+			return true
+		}
+	}
+
+	return false
 }
 
 func main() {
@@ -58,18 +108,33 @@ func main() {
 	var start, _ = strconv.Atoi(split[0])
 	var end, _ = strconv.Atoi(split[1])
 
-	var count = 0
+	var partOne = 0
 	for i := start; i < end; i++ {
 		var stringI = strconv.Itoa(i)
-		var descending = isAscending(stringI)
+		var ascending = isAscending(stringI)
 
-		if descending {
-			var double = hasDoubleDigits(stringI)
+		if ascending {
+			var double = partOneHasDoubleDigits(stringI)
 			if double {
-				count++
+				partOne++
 			}
 		}
 	}
 
-	println(count)
+	fmt.Printf("Part One: %d\n", partOne)
+
+	var partTwo = 0
+	for i := start; i < end; i++ {
+		var stringI = strconv.Itoa(i)
+		var ascending = isAscending(stringI)
+
+		if ascending {
+			var double = partTwoHasDoubleDigits(stringI)
+			if double {
+				partTwo++
+			}
+		}
+	}
+
+	fmt.Printf("Part Two: %d", partTwo)
 }
