@@ -48,7 +48,6 @@ func main() {
 	}
 	fmt.Printf("Part One: %v\n", count1)
 
-
 	for _, line := range strings.Split(string(dat), "\n") {
 		if line == "" {
 			continue
